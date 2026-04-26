@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debkam's Pastry Palace - Luxury Artisanal Pastries</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="contact-info">
+                <i class="fas fa-phone-alt"></i> <span>+234 806 130 8703</span>
+                <span class="divider">|</span>
+                <i class="fab fa-whatsapp"></i> <span>24/7 WhatsApp Orders</span>
+            </div>
+            <div class="language-selector">
+                <button onclick="setLanguage('en')" class="lang-btn">EN</button>
+                <button onclick="setLanguage('fr')" class="lang-btn">FR</button>
+                <button onclick="setLanguage('es')" class="lang-btn">ES</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-logo" onclick="location.href='index.html'">
+            <span class="logo-icon">✦</span>
+            <h2>DEBKAM'S</h2>
+            <span class="logo-sub">PASTRY PALACE</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="track-order.html">Track Order</a>
+            <a href="admin.html">Admin</a>
+        </div>
+        <div class="nav-icons">
+            <a href="shop.html" class="cart-link">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-badge" id="navCartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="gold-text">EST. 2024</span>
+                <h1>Artisanal Pastries<br><span class="gold">Crafted With Precision</span></h1>
+                <div class="hero-divider"></div>
+                <p>Experience the pinnacle of pastry artistry. Each creation is meticulously handcrafted using the finest ingredients, delivering an unforgettable taste of luxury.</p>
+                <div class="hero-buttons">
+                    <a href="shop.html" class="btn-primary">Discover Collection</a>
+                    <a href="#features" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <h3>15+</h3>
+                    <p>Signature Creations</p>
+                </div>
+                <div class="stat">
+                    <h3>1,000+</h3>
+                    <p>Happy Patrons</p>
+                </div>
+                <div class="stat">
+                    <h3>24/7</h3>
+                    <p>Concierge Service</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Cards Section -->
+    <section class="auth-section-home">
+        <div class="container">
+            <h2 class="section-title">Welcome to <span class="gold">Debkam's</span></h2>
+            <p class="section-subtitle">Begin your culinary journey with us</p>
+            <div class="auth-cards">
+                <div class="auth-card" onclick="showSignInModal()">
+                    <div class="card-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>Sign In</h3>
+                    <p>Access your account</p>
+                    <button class="btn-card">Sign In →</button>
+                </div>
+                
+                <div class="auth-card" onclick="showRegisterModal()">
+                    <div class="card-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Join Experience</h3>
+                    <p>Create an account</p>
+                    <button class="btn-card">Join Now →</button>
+                </div>
+                
+      
+         
+        
+            
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="features-header">
+                <span class="section-tag">Why Choose Us</span>
+                <h2 class="section-title">The Debkam's <span class="gold">Difference</span></h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-seedling"></i></div>
+                    <h3>Premium Ingredients</h3>
+                    <p>Sourced from the finest producers worldwide, ensuring exceptional quality in every bite.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                    <h3>Made Fresh Daily</h3>
+                    <p>Each pastry is crafted hours before delivery, guaranteeing peak freshness and flavor.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-truck"></i></div>
+                    <h3>White Glove Delivery</h3>
+                    <p>Experience seamless delivery across Lagos with real-time tracking and care.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fab fa-whatsapp"></i></div>
+                    <h3>Dedicated Support</h3>
+                    <p>Our concierge team is available 24/7 via WhatsApp for personalized assistance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="featured-products">
+        <div class="container">
+            <div class="features-header">
+                <span class="section-tag">Signature Collection</span>
+                <h2 class="section-title">Our <span class="gold">Masterpieces</span></h2>
+            </div>
+            <div class="products-preview" id="productsPreview">
+                <div class="loading">Loading creations...</div>
+            </div>
+            <div class="view-all">
+                <a href="shop.html" class="btn-primary-outline">View Full Collection <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="features-header">
+                <span class="section-tag gold">Simple Process</span>
+                <h2 class="section-title">How It <span class="gold">Works</span></h2>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <i class="fas fa-search"></i>
+                    <h3>Browse</h3>
+                    <p>Explore our curated collection of artisanal pastries</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">02</div>
+                    <i class="fas fa-shopping-bag"></i>
+                    <h3>Select</h3>
+                    <p>Add your favorites to the cart</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">03</div>
+                    <i class="fas fa-user-check"></i>
+                    <h3>Account</h3>
+                    <p>Sign in for a personalized experience</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">04</div>
+                    <i class="fab fa-whatsapp"></i>
+                    <h3>Confirm</h3>
+                    <p>Receive confirmation via WhatsApp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="features-header">
+                <span class="section-tag">Testimonials</span>
+                <h2 class="section-title">What Our <span class="gold">Patrons Say</span></h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"The chocolate fudge cake is absolutely divine. Debkam's has become our go-to for every celebration."</p>
+                    <div class="testimonial-author">
+                        <h4>Sarah O.</h4>
+                        <span>Verified Patron</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"Exceptional quality and presentation. The attention to detail is unmatched."</p>
+                    <div class="testimonial-author">
+                        <h4>Michael A.</h4>
+                        <span>Regular Client</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"Fast delivery and the pastries are always fresh. Highly recommend!"</p>
+                    <div class="testimonial-author">
+                        <h4>Precious O.</h4>
+                        <span>Loyal Customer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Track Order -->
+    <section class="track-section">
+        <div class="container">
+            <div class="track-content">
+                <div class="track-text">
+                    <span class="section-tag">Track Your Order</span>
+                    <h2>Stay Updated on <span class="gold">Your Delivery</span></h2>
+                    <p>Enter your order number to track the status of your delivery in real-time.</p>
+                    <div class="track-box">
+                        <input type="text" id="trackOrderNumber" placeholder="Enter order number">
+                        <button onclick="trackOrder()" class="btn-primary">Track Order</button>
+                    </div>
+                    <div id="trackResult" class="track-result" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h3>Join Our Inner Circle</h3>
+                <p>Subscribe to receive exclusive offers and first access to new collections</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Your email address">
+                    <button>Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>DEBKAM'S</h3>
+                    <p>Luxury artisanal pastries crafted with precision and passion.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://wa.me/2348061308703"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Explore</h4>
+                    <a href="index.html">Home</a>
+                    <a href="shop.html">Collection</a>
+                    <a href="track-order.html">Track Order</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <p><i class="fas fa-phone"></i> +234 806 130 8703</p>
+                    <p><i class="fab fa-whatsapp"></i> WhatsApp Concierge</p>
+                    <p><i class="fas fa-envelope"></i> shogadeo@gmail.com</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Hours</h4>
+                    <p>Monday - Sunday</p>
+                    <p>8:00 AM - 10:00 PM</p>
+                    <p>24/7 Online Ordering</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Debkam's Pastry Palace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal" id="signInModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3>Welcome Back</h3>
+            <input type="email" id="loginEmail" placeholder="Email Address">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="login()" class="btn-gold-full">Sign In</button>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchToRegister()">Join Now</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3>Create Account</h3>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email Address">
+            <input type="tel" id="regPhone" placeholder="Phone Number">
+            <input type="text" id="regAddress" placeholder="Delivery Address">
+            <input type="password" id="regPassword" placeholder="Password">
+            <button onclick="register()" class="btn-gold-full">Create Account</button>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchToLogin()">Sign In</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeReviewModal()">&times;</span>
+            <h3>Share Your Experience</h3>
+            <input type="text" id="reviewName" placeholder="Your Name">
+            <textarea id="reviewText" placeholder="Share your experience..." rows="4"></textarea>
+            <div class="rating-input">
+                <span>Your Rating:</span>
+                <div class="stars-input">
+                    <i class="far fa-star" data-rating="1" onclick="setRating(1)"></i>
+                    <i class="far fa-star" data-rating="2" onclick="setRating(2)"></i>
+                    <i class="far fa-star" data-rating="3" onclick="setRating(3)"></i>
+                    <i class="far fa-star" data-rating="4" onclick="setRating(4)"></i>
+                    <i class="far fa-star" data-rating="5" onclick="setRating(5)"></i>
+                </div>
+            </div>
+            <button onclick="submitReview()" class="btn-gold-full">Submit Review</button>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

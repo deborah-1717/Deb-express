@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Debkam's Pastry Palace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="language-selector small">
+        <button onclick="setLanguage('en')">🇬🇧 EN</button>
+        <button onclick="setLanguage('fr')">🇫🇷 FR</button>
+        <button onclick="setLanguage('es')">🇪🇸 ES</button>
+        <button onclick="setLanguage('yo')">🇳🇬 YO</button>
+        <button onclick="setLanguage('pcm')">🇳🇬 PID</button>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-logo" onclick="goHome()">
+            <h2>🍰 Debkam's Pastry Palace</h2>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" id="navHome">Home</a>
+            <a href="shop.html" class="active" id="navShop">Shop</a>
+            <a href="admin.html" id="navAdmin">Admin</a>
+        </div>
+        <div class="nav-auth">
+            <span id="userDisplay"></span>
+            <button onclick="logout()" id="logoutNavBtn" style="display:none;">Logout</button>
+        </div>
+    </nav>
+
+    <main class="shop-main">
+        <div class="products-header">
+            <h2 id="menuTitle">Our Menu 🍰</h2>
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Search products...">
+            </div>
+        </div>
+        <div class="products-grid" id="productsGrid"></div>
+    </main>
+
+    <div class="cart-floating" id="cartFloating">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="floatingCartCount">0</span>
+    </div>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3 id="cartTitle">Your Cart</h3>
+            <button id="closeCart">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-total">
+            <span id="totalLabel">Total:</span>
+            <span id="cartTotalPrice">₦0</span>
+        </div>
+        <button id="checkoutBtn" class="checkout-btn" id="checkoutBtnText">Proceed to Checkout</button>
+    </div>
+
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
+            <h3 id="checkoutTitle">Order Details</h3>
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label id="nameLabel">Full Name:</label>
+                    <input type="text" id="checkoutName" readonly>
+                </div>
+                <div class="form-group">
+                    <label id="phoneLabel">Phone:</label>
+                    <input type="text" id="checkoutPhone" readonly>
+                </div>
+                <div class="form-group">
+                    <label id="deliveryLabel">Delivery Option:</label>
+                    <select id="deliveryOption">
+                        <option value="pickup" id="pickupOption">Pickup (Free)</option>
+                        <option value="delivery" id="deliveryOptionText">Delivery</option>
+                    </select>
+                </div>
+                <div class="form-group" id="addressGroup" style="display:none;">
+                    <label id="addressLabel">Delivery Address:</label>
+                    <input type="text" id="checkoutAddress">
+                </div>
+                <div class="form-group">
+                    <label id="timeLabel">Pickup/Delivery Time:</label>
+                    <input type="datetime-local" id="pickupTime" required>
+                </div>
+                <div class="order-summary">
+                    <h4 id="orderSummaryTitle">Your Order:</h4>
+                    <div id="orderSummary"></div>
+                    <p><strong id="totalAmountLabel">Total: ₦<span id="orderTotal">0</span></strong></p>
+                </div>
+                <button type="submit" id="confirmOrderBtn">Confirm Order via WhatsApp</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="shop-script.js"></script>
+</body>
+</html>

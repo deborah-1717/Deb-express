@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Debkam's Pastry Palace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="contact-info">
+                <i class="fas fa-phone"></i> <span>+234 806 130 8703</span>
+                <i class="fab fa-whatsapp"></i> <span>WhatsApp Orders</span>
+            </div>
+            <div class="language-selector">
+                <button onclick="setLanguage('en')" class="lang-btn">🇬🇧 EN</button>
+                <button onclick="setLanguage('fr')" class="lang-btn">🇫🇷 FR</button>
+                <button onclick="setLanguage('es')" class="lang-btn">🇪🇸 ES</button>
+                <button onclick="setLanguage('yo')" class="lang-btn">🇳🇬 YO</button>
+                <button onclick="setLanguage('pcm')" class="lang-btn">🇳🇬 PID</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-logo" onclick="goHome()">
+            <i class="fas fa-crown"></i>
+            <h2>Debkam's <span>Pastry Palace</span></h2>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="shop.html" class="active">Shop</a>
+            <a href="track-order.html">Track Order</a>
+            <a href="admin.html">Admin</a>
+        </div>
+        <div class="nav-icons">
+            <a href="#" class="cart-link" onclick="toggleCart()">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-badge" id="cartCount">0</span>
+            </a>
+            <div class="user-icon" id="userIcon" onclick="toggleUserMenu()">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- User Menu Dropdown -->
+    <div class="user-menu" id="userMenu" style="display:none;">
+        <div id="userInfo"></div>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+
+    <!-- Main Shop Content -->
+    <main class="shop-main">
+        <!-- Auth Banner - Shows when not logged in -->
+        <div class="auth-banner" id="authBanner" style="display: flex;">
+            <div class="auth-banner-content">
+                <div class="auth-banner-text">
+                    <i class="fas fa-gift"></i>
+                    <div>
+                        <h4>Ready to Order?</h4>
+                        <p>Sign in or create an account to checkout</p>
+                    </div>
+                </div>
+                <div class="auth-banner-buttons">
+                    <button onclick="showSignInModal()" class="btn-small-gold">Sign In</button>
+                    <button onclick="showRegisterModal()" class="btn-small-outline">Join Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Header -->
+        <div class="products-header">
+            <h2>Our Menu 🍰</h2>
+            <div class="search-filter">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search for pastries, cakes, snacks...">
+            </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filters">
+            <button class="category-btn active" onclick="filterCategory('all')">All Items</button>
+            <button class="category-btn" onclick="filterCategory('cakes')">🎂 Cakes</button>
+            <button class="category-btn" onclick="filterCategory('pastries')">🥐 Pastries</button>
+            <button class="category-btn" onclick="filterCategory('savory')">🍗 Savory</button>
+            <button class="category-btn" onclick="filterCategory('drinks')">🥤 Drinks</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid">
+            <div class="loading-spinner">Loading delicious treats... 🍰</div>
+        </div>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-cart" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p class="empty-cart">Your cart is empty</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Subtotal:</span>
+                <span id="cartTotal">₦0</span>
+            </div>
+            <div style="text-align: center; padding: 10px; font-size: 12px; color: #666;">
+                👉 Use the floating button to checkout
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+
+    <!-- Floating Cart Button -->
+    <div class="cart-floating" id="cartFloating" onclick="toggleCart()">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="floatingCartCount">0</span>
+    </div>
+
+    <!-- Floating Checkout Bar - CIRCLE BUTTON -->
+    <div id="floatingCheckoutBar" style="display: none; position: fixed; bottom: 80px; right: 20px; background: #25D366; width: 50px; height: 50px; border-radius: 50%; z-index: 10000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer;" onclick="proceedToCheckoutDirect()">
+        <div style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;">
+            <i class="fas fa-shopping-bag" style="font-size: 20px;"></i>
+            <span id="floatingItemCount" style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">0</span>
+        </div>
+    </div>
+
+    <!-- Checkout Modal with Pre-order Section -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content" style="max-height: 85vh; overflow-y: auto;">
+            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
+            <h3>Complete Your Order</h3>
+            <form id="checkoutForm" onsubmit="submitOrder(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="checkoutName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="checkoutPhone" placeholder="Enter your phone number">
+                </div>
+                
+                <!-- Payment Method -->
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod" required>
+                        <option value="bank">🏦 Bank Transfer (Opay)</option>
+                        <option value="card" disabled>💳 Card Payment (Coming Soon)</option>
+                    </select>
+                    <small style="color: #999; display: block; margin-top: 5px;">* Card payment coming soon! Only Bank Transfer available now.</small>
+                </div>
+
+                <!-- Bank Info Box -->
+                <div class="bank-info" id="bankInfo">
+                    <p><i class="fas fa-university"></i> <strong>🏦 Bank Transfer Details</strong></p>
+                    <p><i class="fas fa-building"></i> Bank: Opay</p>
+                    <p><i class="fas fa-user"></i> Account Name: <strong>DORIS SHOGADE AMAECHI</strong></p>
+                    <p><i class="fas fa-hashtag"></i> Account Number: <strong>8087299383</strong>
+                        <button type="button" class="copy-bank-btn" onclick="copyBankDetails()">📋 Copy</button>
+                    </p>
+                    <small><i class="fas fa-info-circle"></i> Send payment proof via WhatsApp after ordering</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Delivery Option</label>
+                    <select id="deliveryOption" onchange="toggleAddressField()">
+                        <option value="pickup">📍 Pickup (Free)</option>
+                        <option value="delivery">🚚 Delivery</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="addressGroup" style="display:none;">
+                    <label>Delivery Address</label>
+                    <input type="text" id="checkoutAddress" placeholder="Enter your full address">
+                </div>
+                
+                <div class="form-group">
+                    <label>Preferred Pickup/Delivery Time</label>
+                    <input type="datetime-local" id="pickupTime" required>
+                </div>
+                
+                <div class="order-summary">
+                    <h4>Order Summary</h4>
+                    <div id="orderSummary"></div>
+                    <div class="order-total">
+                        <strong>Total: ₦<span id="orderTotal">0</span></strong>
+                    </div>
+                </div>
+
+                <!-- PRE-ORDER SECTION -->
+                <div class="preorder-section" style="margin-top: 20px; padding: 15px; background: #fef9e6; border-radius: 10px; border-left: 3px solid var(--gold);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i class="fas fa-calendar-alt" style="color: var(--gold); font-size: 1.2rem;"></i>
+                        <label style="font-weight: bold;">
+                            <input type="checkbox" id="isPreorder" onchange="togglePreorderFields()"> This is a pre-order (for events/birthdays)
+                        </label>
+                    </div>
+                    
+                    <div id="preorderFields" style="display: none;">
+                        <div class="form-group">
+                            <label>📅 Delivery/Pickup Date:</label>
+                            <input type="date" id="preorderDate" min="">
+                            <small>Orders require 24-48 hours notice for events</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>⏰ Preferred Time:</label>
+                            <select id="preorderTime">
+                                <option value="10:00">10:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="18:00">6:00 PM</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>🎁 Special Instructions (e.g., cake message):</label>
+                            <textarea id="preorderMessage" rows="2" placeholder="Write 'Happy Birthday', 'Congratulations', cake design requests, etc."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CONFIRM ORDER BUTTON -->
+                <button type="submit" class="btn-gold-full" style="margin-top: 20px; width: 100%; background: #25D366; color: white; padding: 15px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer;">
+                    <i class="fab fa-whatsapp"></i> Confirm Order via WhatsApp
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sign In Modal -->
+    <div class="modal" id="signInModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3>Welcome Back!</h3>
+            <input type="email" id="loginEmail" placeholder="Email Address">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="login()" class="btn-gold-full">Sign In</button>
+            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchToRegister()">Join Now</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h3>Join Our Pastry Family</h3>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="email" id="regEmail" placeholder="Email Address">
+            <input type="tel" id="regPhone" placeholder="Phone Number">
+            <input type="text" id="regAddress" placeholder="Delivery Address">
+            <input type="password" id="regPassword" placeholder="Password">
+            <button onclick="register()" class="btn-gold-full">Create Account</button>
+            <p class="modal-footer">Already have an account? <a href="#" onclick="switchToLogin()">Sign In</a></p>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="shop-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - Debkam's Pastry Palace</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+    body {
+        background: #fef9e6 !important;
+        background-image: none !important;
+    }
+    body::before {
+        display: none !important;
+    }
+</style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <div class="contact-info">
+                <i class="fas fa-phone"></i> <span>+234 806 130 8703</span>
+                <i class="fab fa-whatsapp"></i> <span>WhatsApp Orders</span>
+            </div>
+            <div class="language-selector">
+                <button onclick="setLanguage('en')" class="lang-btn">🇬🇧 EN</button>
+                <button onclick="setLanguage('fr')" class="lang-btn">🇫🇷 FR</button>
+                <button onclick="setLanguage('yo')" class="lang-btn">🇳🇬 YO</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-logo" onclick="goHome()">
+            <i class="fas fa-crown"></i>
+            <h2>Debkam's <span>Pastry Palace</span></h2>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="track-order.html" class="active">Track Order</a>
+            <a href="admin.html">Admin</a>
+        </div>
+    </nav>
+
+    <section class="track-page">
+        <div class="container">
+            <h1>Track Your Order</h1>
+            <p>Enter your order number to see the status</p>
+            <div class="track-input-group">
+                <input type="text" id="trackInput" placeholder="Order Number (e.g., 1735123456789)">
+                <button onclick="trackOrderPage()" class="btn-gold">Track Order</button>
+            </div>
+            <div id="trackResultPage" class="track-result-card" style="display:none;"></div>
+            <div class="recent-orders" id="recentOrders">
+                <h3>Recent Orders</h3>
+                <div id="recentOrdersList"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Debkam's Pastry Palace. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
