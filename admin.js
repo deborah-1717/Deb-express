@@ -1,5 +1,6 @@
-// Google Sheet Web App URL (for saving products to cloud)
-const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwQzj76g1eN7IaAiHKwpvvbIgsSXBj6QN1WFbfM2I12N_r6GcG5FpR-6fWW3TJx1CxBjQ/exec';
+// Supabase Configuration
+const SUPABASE_URL = 'https://lzclrjvwhllrubldijdz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xyanZ3aGxscnVibGRpamR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTg1ODIsImV4cCI6MjA5Mjk3NDU4Mn0.3BczFo1jlNgGAunMhKjlL12l0fZjnpgKGuOXC2BrHYg';
 
 // ImgBB API Key
 const IMGBB_API_KEY = '4cb10b247ebaf9a859dab1c294901ade';
@@ -182,7 +183,32 @@ function previewImage(input) {
     }
 }
 
-// Updated addProduct function with cloud upload to Google Sheet
+// Save product to Supabase
+async function saveProductToSupabase(product) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product)
+        });
+        
+        if (response.ok) {
+            console.log('✅ Product saved to Supabase cloud!');
+            return true;
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Supabase save failed:', error);
+        return false;
+    }
+}
+
+// Updated addProduct function with Supabase cloud storage
 async function addProduct() {
     const name = document.getElementById('newProductName').value;
     const price = parseInt(document.getElementById('newProductPrice').value);
@@ -210,23 +236,17 @@ async function addProduct() {
         name: name,
         price: price,
         img: finalImageUrl,
-        desc: desc,
+        description: desc,
         category: category
     };
     
-    // Save to Google Sheet (cloud) - for everyone to see
-    try {
-        await fetch(SHEET_WEBHOOK_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newProduct)
-        });
-        console.log('✅ Product saved to Google Sheet cloud!');
-    } catch(error) {
-        console.log('⚠️ Cloud save failed:', error);
+    // Save to Supabase (cloud) - for everyone to see
+    const cloudSaveSuccess = await saveProductToSupabase(newProduct);
+    
+    if (cloudSaveSuccess) {
+        alert('✅ Product added to cloud! Everyone will see it.');
+    } else {
+        alert('⚠️ Cloud save failed. Product saved locally only.');
     }
     
     // Also save to localStorage (backup)
@@ -245,7 +265,6 @@ async function addProduct() {
     
     loadProducts();
     loadStats();
-    alert('✅ Product added to cloud! Everyone will see it on refresh.');
     
     // Broadcast update to other tabs/windows
     localStorage.setItem('debkams_products_updated', Date.now().toString());
