@@ -1,3 +1,6 @@
+// Google Sheet Web App URL (for saving products to cloud)
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwQzj76g1eN7IaAiHKwpvvbIgsSXBj6QN1WFbfM2I12N_r6GcG5FpR-6fWW3TJx1CxBjQ/exec';
+
 // ImgBB API Key
 const IMGBB_API_KEY = '4cb10b247ebaf9a859dab1c294901ade';
 
@@ -179,7 +182,7 @@ function previewImage(input) {
     }
 }
 
-// Updated addProduct function with cloud upload
+// Updated addProduct function with cloud upload to Google Sheet
 async function addProduct() {
     const name = document.getElementById('newProductName').value;
     const price = parseInt(document.getElementById('newProductPrice').value);
@@ -202,7 +205,6 @@ async function addProduct() {
         finalImageUrl = await imageToBase64(imageFile);
     }
     
-    const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
     const newProduct = {
         id: Date.now(),
         name: name,
@@ -212,6 +214,23 @@ async function addProduct() {
         category: category
     };
     
+    // Save to Google Sheet (cloud) - for everyone to see
+    try {
+        await fetch(SHEET_WEBHOOK_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newProduct)
+        });
+        console.log('✅ Product saved to Google Sheet cloud!');
+    } catch(error) {
+        console.log('⚠️ Cloud save failed:', error);
+    }
+    
+    // Also save to localStorage (backup)
+    const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
     products.push(newProduct);
     localStorage.setItem('debkams_products', JSON.stringify(products));
     
@@ -226,7 +245,7 @@ async function addProduct() {
     
     loadProducts();
     loadStats();
-    alert('✅ Product added! ' + (cloudImageUrl ? 'Image uploaded to cloud - everyone can see it!' : 'Image saved locally.'));
+    alert('✅ Product added to cloud! Everyone will see it on refresh.');
     
     // Broadcast update to other tabs/windows
     localStorage.setItem('debkams_products_updated', Date.now().toString());
