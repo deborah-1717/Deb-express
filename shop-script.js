@@ -1,3 +1,6 @@
+// Google Sheet CSV URL for reading products from cloud
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv';
+
 // Global Variables
 let products = [];
 let cart = [];
@@ -381,16 +384,76 @@ function updateCartUI() {
     updateFloatingCheckoutBar();
 }
 
-// Load Products
-function loadProducts() {
-    console.log('Loading products...');
+// Load Products from Cloud (Google Sheet) or Local Storage
+async function loadProducts() {
+    console.log('Loading products from cloud...');
+    
+    try {
+        // Try to load from Google Sheet first (cloud)
+        const response = await fetch(SHEET_CSV_URL);
+        const csvText = await response.text();
+        const rows = csvText.split('\n');
+        
+        const cloudProducts = [];
+        
+        // Skip header row (start from index 1)
+        for (let i = 1; i < rows.length; i++) {
+            if (rows[i].trim() === '') continue;
+            
+            // Parse CSV (handles quoted values)
+            let cols = [];
+            let inQuote = false;
+            let currentCol = '';
+            
+            for (let char of rows[i]) {
+                if (char === '"') {
+                    inQuote = !inQuote;
+                } else if (char === ',' && !inQuote) {
+                    cols.push(currentCol);
+                    currentCol = '';
+                } else {
+                    currentCol += char;
+                }
+            }
+            cols.push(currentCol);
+            
+            if (cols.length >= 4 && cols[0]) {
+                cloudProducts.push({
+                    id: parseInt(cols[0]) || Date.now() + i,
+                    name: cols[1] ? cols[1].replace(/"/g, '') : 'Product',
+                    price: parseInt(cols[2]) || 0,
+                    img: cols[3] ? cols[3].replace(/"/g, '') : 'https://picsum.photos/300/200?random=1',
+                    desc: cols[4] ? cols[4].replace(/"/g, '') : '',
+                    category: cols[5] ? cols[5].replace(/"/g, '') : 'other'
+                });
+            }
+        }
+        
+        if (cloudProducts.length > 0) {
+            products = cloudProducts;
+            console.log(`✅ Loaded ${products.length} products from cloud (Google Sheet)`);
+            // Save to localStorage as backup
+            localStorage.setItem('debkams_products', JSON.stringify(products));
+        } else {
+            loadProductsFromLocal();
+        }
+    } catch (error) {
+        console.log('Cloud load failed, using local products:', error);
+        loadProductsFromLocal();
+    }
+    
+    renderProducts();
+}
+
+// Load products from local storage (fallback)
+function loadProductsFromLocal() {
     const stored = localStorage.getItem('debkams_products');
     if (stored && JSON.parse(stored).length > 0) {
         products = JSON.parse(stored);
+        console.log(`📦 Loaded ${products.length} products from local storage`);
     } else {
         createDefaultProducts();
     }
-    renderProducts();
 }
 
 function createDefaultProducts() {
@@ -559,4 +622,4 @@ function setupEventListeners() {
     if (searchInput) searchInput.addEventListener('input', renderProducts);
 }
 
-console.log('Shop script loaded! Checkout with login is active.');
+console.log('Shop script loaded! Cloud sync active. Products load from Google Sheet.');
