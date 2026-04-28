@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Cakes in Lagos | Debkam's Pastry Palace</title>
+    <title>Order Cakes in Lagos | Debkam's Pastry Palace</title>
+    <style>
+    body {
+        background: url('assets/flyer2.png') no-repeat center center fixed !important;
+        background-position: center 20%;
+        background-size: cover !important;
+    }
+    body::before {
+        background: rgba(0, 0, 0, 0.7) !important;
+    }
+</style>
     <meta name="description" content="Order fresh artisanal cakes, birthday cakes, and custom pastries in Lagos. Fast delivery from Debkam's Pastry Palace.">
-
-<meta name="keywords" content="cakes in Lagos, birthday cakes Lagos, order cakes online Nigeria, custom cakes Lagos">
-
-<meta name="author" content="Debkam's Pastry Palace">
+    <meta name="keywords" content="cakes in Lagos, birthday cakes Lagos, order cakes online Nigeria, custom cakes Lagos">
+    <meta name="author" content="Debkam's Pastry Palace">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Top Bar -->
+    <!-- Top Bar
+      -->
     <div class="top-bar">
         <div class="top-bar-content">
             <div class="contact-info">
@@ -42,6 +51,7 @@
             <a href="shop.html">Shop</a>
             <a href="track-order.html">Track Order</a>
             <a href="admin.html">Admin</a>
+            <button onclick="logout()" class="logout-btn-nav">Logout</button>
         </div>
         <div class="nav-icons">
             <a href="shop.html" class="cart-link">
@@ -59,10 +69,10 @@
         <div class="hero-content">
             <div class="hero-text">
                 <span class="gold-text">EST. 2024</span>
-              <h1>
-    Order Fresh Cakes in Lagos<br>
-    <span class="gold">Custom & Birthday Cakes</span>
-</h1>
+                <h1>
+                    Order Fresh Cakes in Lagos<br>
+                    <span class="gold">Custom & Birthday Cakes</span>
+                </h1>
                 <div class="hero-divider"></div>
                 <p>Experience the pinnacle of pastry artistry. Each creation is meticulously handcrafted using the finest ingredients, delivering an unforgettable taste of luxury.</p>
                 <div class="hero-buttons">
@@ -110,11 +120,7 @@
                     <p>Create an account</p>
                     <button class="btn-card">Join Now →</button>
                 </div>
-                
-      
-         
-        
-            
+            </div>
         </div>
     </section>
 
@@ -353,6 +359,44 @@
             <button onclick="submitReview()" class="btn-gold-full">Submit Review</button>
         </div>
     </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeCheckoutModal()">&times;</span>
+            <h3>Complete Your Order</h3>
+            <form onsubmit="submitOrder(event)">
+                <input type="text" id="checkoutName" placeholder="Full Name" required>
+                <input type="tel" id="checkoutPhone" placeholder="Phone Number" required>
+                <textarea id="checkoutAddress" placeholder="Delivery Address"></textarea>
+                <select id="deliveryOption" onchange="toggleAddressField()">
+                    <option value="pickup">Pickup</option>
+                    <option value="delivery">Delivery</option>
+                </select>
+                <input type="datetime-local" id="pickupTime">
+                <div class="preorder-checkbox">
+                    <label>
+                        <input type="checkbox" id="isPreorder" onchange="togglePreorderFields()">
+                        This is a pre-order
+                    </label>
+                </div>
+                <div id="preorderFields" style="display: none;">
+                    <input type="date" id="preorderDate" placeholder="Pre-order Date">
+                    <input type="time" id="preorderTime" placeholder="Pre-order Time">
+                    <textarea id="preorderMessage" placeholder="Special message for pre-order..."></textarea>
+                </div>
+                <div id="orderSummary"></div>
+                <h4>Total: ₦<span id="orderTotal">0</span></h4>
+                <button type="submit" class="btn-gold-full">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+   <!-- Floating Checkout Bar - Small Circle -->
+<div id="floatingCheckoutBar" style="display: none; position: fixed; bottom: 80px; right: 20px; background: #25D366; width: 50px; height: 50px; border-radius: 50%; z-index: 99999; box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; text-align: center;" onclick="checkoutWithLogin()">
+    <i class="fas fa-shopping-bag" style="font-size: 20px; line-height: 50px; color: white;"></i>
+    <span id="floatingItemCount" style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">0</span>
+</div>
 
     <script src="translations.js"></script>
     <script src="script.js"></script>
