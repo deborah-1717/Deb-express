@@ -1,6 +1,6 @@
-// Google Sheet CSV URL for reading products from cloud
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv';
-https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv
+// Supabase Configuration (YOUR WORKING CONFIG)
+const SUPABASE_URL = 'https://lzclrjvwhllrubldijdz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xyanZ3aGxscnVibGRpamR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTg1ODIsImV4cCI6MjA5Mjk3NDU4Mn0.3BczFo1jlNgGAunMhKjlL12l0fZjnpgKGuOXC2BrHYg';
 
 // Global variables
 let products = [];
@@ -45,51 +45,31 @@ function fixFloatingButton() {
     }
 }
 
-// Load products from cloud (Google Sheet) or local storage
+// Load products from Supabase (cloud) or local storage
 async function loadProducts() {
     try {
-        // Try to load from Google Sheet first (cloud)
-        console.log('Fetching products from Google Sheet...');
-        const response = await fetch(SHEET_CSV_URL);
+        console.log('Fetching products from Supabase...');
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
         
-        if (!response.ok) {
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                products = data;
+                localStorage.setItem('debkams_products', JSON.stringify(products));
+                console.log(`✅ Loaded ${products.length} products from Supabase cloud`);
+            } else {
+                loadProductsFromLocal();
+            }
+        } else {
             throw new Error(`HTTP ${response.status}`);
         }
-        
-        const csvText = await response.text();
-        const rows = csvText.split('\n');
-        
-        const cloudProducts = [];
-        
-        // Skip header row (start from index 1)
-        for (let i = 1; i < rows.length; i++) {
-            if (rows[i].trim() === '') continue;
-            
-            // Parse CSV
-            const cols = rows[i].split(',');
-            
-            if (cols.length >= 4 && cols[0]) {
-                cloudProducts.push({
-                    id: parseInt(cols[0]) || Date.now() + i,
-                    name: cols[1] ? cols[1].replace(/"/g, '') : 'Product',
-                    price: parseInt(cols[2]) || 0,
-                    img: cols[3] ? cols[3].replace(/"/g, '') : 'assets/placeholder.webp',
-                    desc: cols[4] ? cols[4].replace(/"/g, '') : '',
-                    category: cols[5] ? cols[5].replace(/"/g, '').toLowerCase() : 'other'
-                });
-            }
-        }
-        
-        if (cloudProducts.length > 0) {
-            products = cloudProducts;
-            console.log(`✅ Loaded ${products.length} products from Google Sheet cloud`);
-            // Save to localStorage as backup
-            localStorage.setItem('debkams_products', JSON.stringify(products));
-        } else {
-            loadProductsFromLocal();
-        }
     } catch (error) {
-        console.log('Cloud load failed, using local products:', error);
+        console.log('Supabase failed, using local products:', error);
         loadProductsFromLocal();
     }
     
@@ -134,7 +114,6 @@ function createDefaultProducts() {
 }
 
 function renderProducts() {
-    // This function should exist in shop-script.js
     if (typeof window.renderProducts === 'function') {
         window.renderProducts();
     }
@@ -780,4 +759,4 @@ window.toggleAddressField = toggleAddressField;
 window.togglePreorderFields = togglePreorderFields;
 window.renderProducts = renderProducts;
 
-console.log('Script loaded! Products will load from Google Sheet cloud.');
+console.log('Script loaded! Products will load from Supabase cloud.');
