@@ -15,7 +15,46 @@
     body::before {
         display: none !important;
     }
-</style>
+    .image-upload-section {
+        margin: 15px 0;
+    }
+    .image-upload-section label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    .upload-btn {
+        background: #25D366;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .upload-btn:hover {
+        background: #128C7E;
+    }
+    #imagePreview {
+        margin: 10px 0;
+        text-align: center;
+    }
+    #previewImg {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #d4af37;
+        padding: 3px;
+    }
+    #uploadStatus {
+        font-size: 12px;
+        margin-top: 5px;
+        text-align: center;
+    }
+    </style>
 </head>
 <body>
     <div class="admin-container">
@@ -23,7 +62,6 @@
             <h2>🔐 Admin Login</h2>
             <input type="password" id="adminPassword" placeholder="Enter Admin Password">
             <button id="adminLoginBtn">Login</button>
-          
         </div>
 
         <div class="admin-dashboard" id="adminDashboard" style="display:none;">
@@ -37,31 +75,13 @@
                 <div class="stat-card"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
                 <div class="stat-card"><h3>Total Customers</h3><p id="totalCustomers">0</p></div>
             </div>
-            <div class="admin-stats">
-    <div class="stat-card">
-        <h3>Total Products</h3>
-        <p id="totalProducts">0</p>
-    </div>
-    <div class="stat-card">
-        <h3>Total Orders</h3>
-        <p id="totalOrders">0</p>
-    </div>
-    <div class="stat-card">
-        <h3>Total Customers</h3>
-        <p id="totalCustomers">0</p>
-    </div>
-</div>
 
-<!-- ADD THIS RESET BUTTON HERE -->
-<div style="text-align: center; margin: 20px 0;">
-    <button onclick="resetAllData()" style="background: #dc3545; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">
-        🗑️ RESET ALL DATA
-    </button>
-</div>
-
-<div class="admin-tabs">
-    ...
-</div>
+            <!-- RESET BUTTON -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button onclick="resetAllData()" style="background: #dc3545; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">
+                    🗑️ RESET ALL DATA
+                </button>
+            </div>
 
             <div class="admin-tabs">
                 <button class="admin-tab active" data-tab="products">📦 Products</button>
@@ -74,9 +94,30 @@
                     <h3>➕ Add New Product</h3>
                     <input type="text" id="newProductName" placeholder="Product Name">
                     <input type="number" id="newProductPrice" placeholder="Price (₦)">
-                    <input type="text" id="newProductImage" placeholder="Image URL (assets/xx.webp)">
+                    
+                    <!-- Image Upload Section with Cloud Upload -->
+                    <div class="image-upload-section">
+                        <label>📸 Product Image:</label>
+                        <input type="file" id="newProductImageFile" accept="image/*" onchange="uploadToImgBB(this)" style="display: none;">
+                        <button type="button" class="upload-btn" onclick="document.getElementById('newProductImageFile').click()">
+                            <i class="fas fa-cloud-upload-alt"></i> Choose Image from Gallery
+                        </button>
+                        <div id="imagePreview" style="margin: 10px 0; display: none;">
+                            <img id="previewImg" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div id="uploadStatus" style="font-size: 12px; margin-top: 5px;"></div>
+                        <input type="hidden" id="uploadedImageUrl">
+                        <small style="display: block; text-align: center; margin-top: 5px;">Image uploads to cloud - everyone can see it!</small>
+                    </div>
+                    
                     <textarea id="newProductDesc" placeholder="Description"></textarea>
-                    <button id="addProductBtn">Add Product</button>
+                    <select id="newProductCategory">
+                        <option value="cakes">🎂 Cakes</option>
+                        <option value="pastries">🥐 Pastries</option>
+                        <option value="savory">🍗 Savory</option>
+                        <option value="drinks">🥤 Drinks</option>
+                    </select>
+                    <button id="addProductBtn">➕ Add Product</button>
                 </div>
                 <div id="productsListAdmin"></div>
             </div>
