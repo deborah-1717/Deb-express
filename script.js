@@ -1,6 +1,6 @@
-// Google Sheet CSV URL for reading products from cloud
-// Google Sheet CSV URL for reading products from cloud
+// Google Sheet CSV URL for reading products from cloud (WORKING LINK)
 const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv';
+
 // Global variables
 let products = [];
 let cart = [];
@@ -48,47 +48,40 @@ function fixFloatingButton() {
 async function loadProducts() {
     try {
         // Try to load from Google Sheet first (cloud)
+        console.log('Fetching products from Google Sheet...');
         const response = await fetch(SHEET_CSV_URL);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const csvText = await response.text();
         const rows = csvText.split('\n');
         
-        products = [];
+        const cloudProducts = [];
         
         // Skip header row (start from index 1)
         for (let i = 1; i < rows.length; i++) {
             if (rows[i].trim() === '') continue;
             
-            // Parse CSV (handles quoted values)
-            let cols = [];
-            let inQuote = false;
-            let currentCol = '';
-            
-            for (let char of rows[i]) {
-                if (char === '"') {
-                    inQuote = !inQuote;
-                } else if (char === ',' && !inQuote) {
-                    cols.push(currentCol);
-                    currentCol = '';
-                } else {
-                    currentCol += char;
-                }
-            }
-            cols.push(currentCol);
+            // Parse CSV
+            const cols = rows[i].split(',');
             
             if (cols.length >= 4 && cols[0]) {
-                products.push({
+                cloudProducts.push({
                     id: parseInt(cols[0]) || Date.now() + i,
                     name: cols[1] ? cols[1].replace(/"/g, '') : 'Product',
                     price: parseInt(cols[2]) || 0,
                     img: cols[3] ? cols[3].replace(/"/g, '') : 'assets/placeholder.webp',
                     desc: cols[4] ? cols[4].replace(/"/g, '') : '',
-                    category: cols[5] ? cols[5].replace(/"/g, '') : 'other'
+                    category: cols[5] ? cols[5].replace(/"/g, '').toLowerCase() : 'other'
                 });
             }
         }
         
-        if (products.length > 0) {
-            console.log(`✅ Loaded ${products.length} products from cloud (Google Sheet)`);
+        if (cloudProducts.length > 0) {
+            products = cloudProducts;
+            console.log(`✅ Loaded ${products.length} products from Google Sheet cloud`);
             // Save to localStorage as backup
             localStorage.setItem('debkams_products', JSON.stringify(products));
         } else {
@@ -99,11 +92,10 @@ async function loadProducts() {
         loadProductsFromLocal();
     }
     
-    // Update UI if on shop page
-    if (document.getElementById('productsGrid')) {
+    // Update UI
+    if (typeof renderProducts === 'function') {
         renderProducts();
     }
-    // Update UI if on homepage
     if (document.getElementById('productsPreview')) {
         displayFeaturedProducts();
     }
@@ -115,31 +107,33 @@ function loadProductsFromLocal() {
     if (stored && JSON.parse(stored).length > 0) {
         products = JSON.parse(stored);
     } else {
-        // Default products
-        products = [
-            { id:1, name:"Chocolate Fudge Cake", price:6000, img:"assets/13.webp", desc:"Rich chocolate fudge cake", category:"cakes" },
-            { id:2, name:"Red Velvet", price:4000, img:"assets/14.webp", desc:"Classic red velvet", category:"cakes" },
-            { id:3, name:"Birthday cake", price:25000, img:"assets/15.webp", desc:"Custom birthday cake", category:"cakes" },
-            { id:4, name:"Spring rolls(10pcs)", price:4000, img:"assets/16.webp", desc:"Crispy spring rolls", category:"savory" },
-            { id:5, name:"Chicken pie(6pcs)", price:9000, img:"assets/17.webp", desc:"Savory chicken pie", category:"savory" },
-            { id:6, name:"Samosa(12pcs)", price:4000, img:"assets/18.webp", desc:"Spicy samosas", category:"savory" },
-            { id:7, name:"Yoghurt", price:2500, img:"assets/21.webp", desc:"Creamy yoghurt", category:"drinks" },
-            { id:8, name:"Fried Rice", price:5500, img:"assets/22.webp", desc:"Special fried rice", category:"savory" },
-            { id:9, name:"Grilled Chicken", price:3500, img:"assets/23.webp", desc:"Spicy grilled chicken", category:"savory" },
-            { id:10, name:"Chocolate Croissant (box of 3)", price:12000, img:"assets/24.webp", desc:"Buttery chocolate croissants", category:"pastries" },
-            { id:11, name:"Cinnamon Rolls (box of 4)", price:12000, img:"assets/25.webp", desc:"Sweet cinnamon rolls", category:"pastries" },
-            { id:12, name:"Meat Pie(6pcs)", price:6000, img:"assets/35.webp", desc:"Savory meat pie", category:"savory" },
-            { id:13, name:"Chocolate Crunch Cake", price:8000, img:"assets/34.webp", desc:"Crunchy chocolate cake", category:"cakes" },
-            { id:14, name:"Burger and Fries With Chicken (Combo)", price:12000, img:"assets/36.webp", desc:"Complete meal combo", category:"savory" }
-        ];
-        localStorage.setItem('debkams_products', JSON.stringify(products));
+        createDefaultProducts();
     }
     console.log(`📦 Loaded ${products.length} products from local storage`);
 }
 
-// Render products on shop page (assuming this function exists)
+function createDefaultProducts() {
+    products = [
+        { id:1, name:"Chocolate Fudge Cake", price:6000, img:"assets/13.webp", desc:"Rich chocolate fudge cake", category:"cakes" },
+        { id:2, name:"Red Velvet", price:4000, img:"assets/14.webp", desc:"Classic red velvet", category:"cakes" },
+        { id:3, name:"Birthday cake", price:25000, img:"assets/15.webp", desc:"Custom birthday cake", category:"cakes" },
+        { id:4, name:"Spring rolls(10pcs)", price:4000, img:"assets/16.webp", desc:"Crispy spring rolls", category:"savory" },
+        { id:5, name:"Chicken pie(6pcs)", price:9000, img:"assets/17.webp", desc:"Savory chicken pie", category:"savory" },
+        { id:6, name:"Samosa(12pcs)", price:4000, img:"assets/18.webp", desc:"Spicy samosas", category:"savory" },
+        { id:7, name:"Yoghurt", price:2500, img:"assets/21.webp", desc:"Creamy yoghurt", category:"drinks" },
+        { id:8, name:"Fried Rice", price:5500, img:"assets/22.webp", desc:"Special fried rice", category:"savory" },
+        { id:9, name:"Grilled Chicken", price:3500, img:"assets/23.webp", desc:"Spicy grilled chicken", category:"savory" },
+        { id:10, name:"Chocolate Croissant (box of 3)", price:12000, img:"assets/24.webp", desc:"Buttery chocolate croissants", category:"pastries" },
+        { id:11, name:"Cinnamon Rolls (box of 4)", price:12000, img:"assets/25.webp", desc:"Sweet cinnamon rolls", category:"pastries" },
+        { id:12, name:"Meat Pie(6pcs)", price:6000, img:"assets/35.webp", desc:"Savory meat pie", category:"savory" },
+        { id:13, name:"Chocolate Crunch Cake", price:8000, img:"assets/34.webp", desc:"Crunchy chocolate cake", category:"cakes" },
+        { id:14, name:"Burger and Fries With Chicken (Combo)", price:12000, img:"assets/36.webp", desc:"Complete meal combo", category:"savory" }
+    ];
+    localStorage.setItem('debkams_products', JSON.stringify(products));
+}
+
 function renderProducts() {
-    // This function should already exist in your shop-script.js
+    // This function should exist in shop-script.js
     if (typeof window.renderProducts === 'function') {
         window.renderProducts();
     }
@@ -192,7 +186,6 @@ function loadCartCount() {
     if (floatingCount) floatingCount.textContent = count;
 }
 
-// FIXED: This function now only shows/hides, doesn't change shape
 function updateFloatingCheckoutBar() {
     const bar = document.getElementById('floatingCheckoutBar');
     if (!bar) return;
@@ -200,7 +193,7 @@ function updateFloatingCheckoutBar() {
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
     if (cart.length > 0) {
         bar.style.display = 'block';
-        fixFloatingButton(); // Re-apply circle style
+        fixFloatingButton();
     } else {
         bar.style.display = 'none';
     }
@@ -223,7 +216,10 @@ function checkUserStatus() {
 }
 
 function setupEventListeners() {
-    // Any additional event listeners
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.addEventListener('input', function() {
+        if (typeof renderProducts === 'function') renderProducts();
+    });
 }
 
 function showNotification(message, type) {
@@ -783,4 +779,4 @@ window.toggleAddressField = toggleAddressField;
 window.togglePreorderFields = togglePreorderFields;
 window.renderProducts = renderProducts;
 
-console.log('Script loaded! checkoutWithLogin function available:', typeof checkoutWithLogin);
+console.log('Script loaded! Products will load from Google Sheet cloud.');
