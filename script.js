@@ -1,5 +1,4 @@
-// Google Sheet CSV URL for reading products from cloud (WORKING LINK)
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv';
+https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv
 
 // Global variables
 let products = [];
