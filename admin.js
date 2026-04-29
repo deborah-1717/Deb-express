@@ -109,7 +109,7 @@ function loadProducts() {
                 <small>${product.category || 'Uncategorized'}</small>
             </div>
             <div class="admin-product-actions">
-             <button onclick="deleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')" class="delete-btn">🗑️ Delete</button>
+                <button onclick="deleteProduct(${product.id}, '${product.name.replace(/'/g, "\\'")}')" class="delete-btn">🗑️ Delete</button>
             </div>
         </div>
     `).join('');
@@ -270,17 +270,31 @@ async function addProduct() {
     localStorage.setItem('debkams_products_updated', Date.now().toString());
 }
 
-// Delete product
-function deleteProduct(productId) {
-    if (confirm('Delete this product?')) {
-        let products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
-        products = products.filter(p => p.id !== productId);
-        localStorage.setItem('debkams_products', JSON.stringify(products));
-        loadProducts();
-        loadStats();
+// Delete product from Supabase (CLOUD) - UPDATED with product name
+async function deleteProduct(productId, productName) {
+    if (confirm(`⚠️ Delete "${productName}"? This will remove it for ALL customers.`)) {
+        // Delete from Supabase cloud
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
         
-        // Broadcast update
-        localStorage.setItem('debkams_products_updated', Date.now().toString());
+        if (response.ok) {
+            alert(`✅ "${productName}" deleted from cloud!`);
+            
+            // Also remove from localStorage
+            let products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
+            products = products.filter(p => p.id !== productId);
+            localStorage.setItem('debkams_products', JSON.stringify(products));
+            
+            // Refresh the page to show updated list
+            location.reload();
+        } else {
+            alert('❌ Delete failed. Please try again.');
+        }
     }
 }
 
