@@ -1,5 +1,5 @@
-
-// FORCE REDEPLOY - v3 - SUPABASE ONLY// Supabase Configuration
+// FORCE REDEPLOY - v3 - SUPABASE ONLY
+// Supabase Configuration
 const SUPABASE_URL = 'https://lzclrjvwhllrubldijdz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xyanZ3aGxscnVibGRpamR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTg1ODIsImV4cCI6MjA5Mjk3NDU4Mn0.3BczFo1jlNgGAunMhKjlL12l0fZjnpgKGuOXC2BrHYg';
 
@@ -59,7 +59,7 @@ async function loadProducts() {
         console.log('Supabase failed:', error);
         loadProductsFromLocal();
     }
-    if (typeof renderProducts === 'function') renderProducts();
+    renderProducts();
     if (document.getElementById('productsPreview')) displayFeaturedProducts();
 }
 
@@ -93,8 +93,54 @@ function createDefaultProducts() {
     localStorage.setItem('debkams_products', JSON.stringify(products));
 }
 
+// FIXED: No recursive call
 function renderProducts() {
-    if (typeof window.renderProducts === 'function') window.renderProducts();
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    let filtered = [...products];
+    
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(p => p.category === currentFilter);
+    }
+    
+    if (searchTerm) {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+    }
+    
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="no-results">No products found</div>`;
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(product => {
+        const cartItem = (cart || []).find(i => i.id === product.id);
+        const quantity = cartItem?.quantity || 0;
+        
+        return `
+            <div class="product-card">
+                <img src="${product.img}" alt="${product.name}" onerror="this.src='https://picsum.photos/300/200?random=1'">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="product-desc">${product.desc || product.description || ''}</p>
+                    <div class="product-price">₦${product.price.toLocaleString()}</div>
+                    ${quantity > 0 ? `
+                        <div class="product-quantity-control">
+                            <button class="qty-btn" onclick="updateQuantity(${product.id}, -1)">-</button>
+                            <span>${quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${product.id}, 1)">+</button>
+                            <button class="remove-btn" onclick="removeFromCart(${product.id})">Remove</button>
+                        </div>
+                    ` : `
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function displayFeaturedProducts() {
@@ -168,7 +214,7 @@ function checkUserStatus() {
 function setupEventListeners() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.addEventListener('input', function() {
-        if (typeof renderProducts === 'function') renderProducts();
+        renderProducts();
     });
 }
 
