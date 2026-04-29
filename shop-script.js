@@ -1,5 +1,6 @@
-// Google Sheet CSV URL for reading products from cloud
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ2hych5HgL65398qWIvKnIxNvhrTymsbyxUNEloaQfxQOJiubIe_VADWmWW-rCkUuQOxbY0kHbyBPp/pub?output=csv';
+// Supabase Configuration
+const SUPABASE_URL = 'https://lzclrjvwhllrubldijdz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xyanZ3aGxscnVibGRpamR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTg1ODIsImV4cCI6MjA5Mjk3NDU4Mn0.3BczFo1jlNgGAunMhKjlL12l0fZjnpgKGuOXC2BrHYg';
 
 // Global Variables
 let products = [];
@@ -52,7 +53,6 @@ window.checkoutWithLogin = function() {
 window.submitOrder = function(event) {
     event.preventDefault();
     
-    // LOGIN CHECK - THIS IS THE KEY FIX
     const user = localStorage.getItem('debkams_user');
     if (!user) {
         alert('🔐 LOGIN REQUIRED!\n\nYou must sign in or create an account to place an order.');
@@ -131,29 +131,6 @@ window.submitOrder = function(event) {
     sessionStorage.removeItem('redirectAfterLogin');
 };
 
-// Force reload products
-window.forceReloadProducts = function() {
-    const defaultProducts = [
-        { id:1, name:"Chocolate Fudge Cake", price:6000, img:"https://picsum.photos/id/106/300/200", desc:"Rich chocolate fudge cake", category:"cakes" },
-        { id:2, name:"Red Velvet", price:4000, img:"https://picsum.photos/id/132/300/200", desc:"Classic red velvet", category:"cakes" },
-        { id:3, name:"Birthday cake", price:25000, img:"https://picsum.photos/id/125/300/200", desc:"Custom birthday cake", category:"cakes" },
-        { id:4, name:"Spring rolls(10pcs)", price:4000, img:"https://picsum.photos/id/29/300/200", desc:"Crispy spring rolls", category:"savory" },
-        { id:5, name:"Chicken pie(6pcs)", price:9000, img:"https://picsum.photos/id/117/300/200", desc:"Savory chicken pie", category:"savory" },
-        { id:6, name:"Samosa(12pcs)", price:4000, img:"https://picsum.photos/id/130/300/200", desc:"Spicy samosas", category:"savory" },
-        { id:7, name:"Yoghurt", price:2500, img:"https://picsum.photos/id/149/300/200", desc:"Creamy yoghurt", category:"drinks" },
-        { id:8, name:"Fried Rice", price:5500, img:"https://picsum.photos/id/127/300/200", desc:"Special fried rice", category:"savory" },
-        { id:9, name:"Grilled Chicken", price:3500, img:"https://picsum.photos/id/120/300/200", desc:"Spicy grilled chicken", category:"savory" },
-        { id:10, name:"Chocolate Croissant (3pcs)", price:12000, img:"https://picsum.photos/id/40/300/200", desc:"Buttery chocolate croissants", category:"pastries" },
-        { id:11, name:"Cinnamon Rolls (4pcs)", price:12000, img:"https://picsum.photos/id/36/300/200", desc:"Sweet cinnamon rolls", category:"pastries" },
-        { id:12, name:"Meat Pie(6pcs)", price:6000, img:"https://picsum.photos/id/118/300/200", desc:"Savory meat pie", category:"savory" },
-        { id:13, name:"Chocolate Crunch Cake", price:8000, img:"https://picsum.photos/id/109/300/200", desc:"Crunchy chocolate cake", category:"cakes" },
-        { id:14, name:"Burger and Fries Combo", price:12000, img:"https://picsum.photos/id/115/300/200", desc:"Complete meal combo", category:"savory" }
-    ];
-    localStorage.setItem('debkams_products', JSON.stringify(defaultProducts));
-    alert('Products reloaded! Page will refresh.');
-    location.reload();
-};
-
 // Update floating checkout bar
 function updateFloatingCheckoutBar() {
     const bar = document.getElementById('floatingCheckoutBar');
@@ -176,7 +153,6 @@ function updateFloatingCheckoutBar() {
 function showCheckoutModal() {
     const user = localStorage.getItem('debkams_user');
     
-    // Add login check here too
     if (!user) {
         alert('🔐 LOGIN REQUIRED!\n\nPlease sign in to checkout.');
         showSignInModal();
@@ -384,61 +360,33 @@ function updateCartUI() {
     updateFloatingCheckoutBar();
 }
 
-// Load Products from Cloud (Google Sheet) or Local Storage
+// Load Products from Supabase (Cloud)
 async function loadProducts() {
-    console.log('Loading products from cloud...');
+    console.log('Loading products from Supabase cloud...');
     
     try {
-        // Try to load from Google Sheet first (cloud)
-        const response = await fetch(SHEET_CSV_URL);
-        const csvText = await response.text();
-        const rows = csvText.split('\n');
-        
-        const cloudProducts = [];
-        
-        // Skip header row (start from index 1)
-        for (let i = 1; i < rows.length; i++) {
-            if (rows[i].trim() === '') continue;
-            
-            // Parse CSV (handles quoted values)
-            let cols = [];
-            let inQuote = false;
-            let currentCol = '';
-            
-            for (let char of rows[i]) {
-                if (char === '"') {
-                    inQuote = !inQuote;
-                } else if (char === ',' && !inQuote) {
-                    cols.push(currentCol);
-                    currentCol = '';
-                } else {
-                    currentCol += char;
-                }
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
             }
-            cols.push(currentCol);
-            
-            if (cols.length >= 4 && cols[0]) {
-                cloudProducts.push({
-                    id: parseInt(cols[0]) || Date.now() + i,
-                    name: cols[1] ? cols[1].replace(/"/g, '') : 'Product',
-                    price: parseInt(cols[2]) || 0,
-                    img: cols[3] ? cols[3].replace(/"/g, '') : 'https://picsum.photos/300/200?random=1',
-                    desc: cols[4] ? cols[4].replace(/"/g, '') : '',
-                    category: cols[5] ? cols[5].replace(/"/g, '') : 'other'
-                });
-            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
         
-        if (cloudProducts.length > 0) {
-            products = cloudProducts;
-            console.log(`✅ Loaded ${products.length} products from cloud (Google Sheet)`);
-            // Save to localStorage as backup
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            products = data;
+            console.log(`✅ Loaded ${products.length} products from Supabase cloud`);
             localStorage.setItem('debkams_products', JSON.stringify(products));
         } else {
             loadProductsFromLocal();
         }
     } catch (error) {
-        console.log('Cloud load failed, using local products:', error);
+        console.log('Supabase load failed, using local products:', error);
         loadProductsFromLocal();
     }
     
@@ -505,7 +453,7 @@ function renderProducts() {
                 <img src="${product.img}" alt="${product.name}" onerror="this.src='https://picsum.photos/300/200?random=1'">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <p class="product-desc">${product.desc}</p>
+                    <p class="product-desc">${product.desc || product.description || ''}</p>
                     <div class="product-price">₦${product.price.toLocaleString()}</div>
                     ${quantity > 0 ? `
                         <div class="product-quantity-control">
@@ -622,4 +570,4 @@ function setupEventListeners() {
     if (searchInput) searchInput.addEventListener('input', renderProducts);
 }
 
-console.log('Shop script loaded! Cloud sync active. Products load from Google Sheet.');
+console.log('Shop script loaded! Products load from Supabase cloud.');
