@@ -89,30 +89,73 @@ function loadStats() {
     document.getElementById('totalCustomers').textContent = users.length;
 }
 
-function loadProducts() {
-    const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
-    const container = document.getElementById('productsListAdmin');
-    
-    if (!container) return;
-    
-    if (products.length === 0) {
-        container.innerHTML = '<p>No products yet. Add some!</p>';
-        return;
+// Updated loadProducts - fetches from Supabase cloud
+async function loadProducts() {
+    try {
+        // Fetch from Supabase cloud
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+        
+        if (response.ok) {
+            const products = await response.json();
+            // Update localStorage with cloud data
+            localStorage.setItem('debkams_products', JSON.stringify(products));
+            
+            // Display products in admin panel
+            const container = document.getElementById('productsListAdmin');
+            if (!container) return;
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p>No products yet. Add some!</p>';
+                return;
+            }
+            
+            container.innerHTML = products.map(product => `
+                <div class="admin-product-card">
+                    <img src="${product.img}" onerror="this.src='https://via.placeholder.com/60'">
+                    <div class="admin-product-info">
+                        <h4>${product.name}</h4>
+                        <p>₦${product.price.toLocaleString()}</p>
+                        <small>${product.category || 'Uncategorized'}</small>
+                    </div>
+                    <div class="admin-product-actions">
+                        <button onclick="deleteProduct(${product.id})" class="delete-btn">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        console.log('Supabase fetch failed, using local:', error);
+        // Fallback to localStorage
+        const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
+        const container = document.getElementById('productsListAdmin');
+        if (!container) return;
+        
+        if (products.length === 0) {
+            container.innerHTML = '<p>No products yet. Add some!</p>';
+            return;
+        }
+        
+        container.innerHTML = products.map(product => `
+            <div class="admin-product-card">
+                <img src="${product.img}" onerror="this.src='https://via.placeholder.com/60'">
+                <div class="admin-product-info">
+                    <h4>${product.name}</h4>
+                    <p>₦${product.price.toLocaleString()}</p>
+                    <small>${product.category || 'Uncategorized'}</small>
+                </div>
+                <div class="admin-product-actions">
+                    <button onclick="deleteProduct(${product.id})" class="delete-btn">🗑️ Delete</button>
+                </div>
+            </div>
+        `).join('');
     }
-    
-    container.innerHTML = products.map(product => `
-        <div class="admin-product-card">
-            <img src="${product.img}" onerror="this.src='https://via.placeholder.com/60'">
-            <div class="admin-product-info">
-                <h4>${product.name}</h4>
-                <p>₦${product.price.toLocaleString()}</p>
-                <small>${product.category || 'Uncategorized'}</small>
-            </div>
-            <div class="admin-product-actions">
-                <button onclick="deleteProduct(${product.id})" class="delete-btn">🗑️ Delete</button>
-            </div>
-        </div>
-    `).join('');
 }
 
 // ========== IMAGE UPLOAD FUNCTIONS ==========
@@ -208,6 +251,29 @@ async function saveProductToSupabase(product) {
     }
 }
 
+// Delete product from Supabase
+async function deleteProductFromSupabase(productId) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+        
+        if (response.ok) {
+            console.log(`✅ Product ${productId} deleted from Supabase`);
+            return true;
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Supabase delete failed:', error);
+        return false;
+    }
+}
+
 // Updated addProduct function with Supabase cloud storage
 async function addProduct() {
     const name = document.getElementById('newProductName').value;
@@ -270,12 +336,24 @@ async function addProduct() {
     localStorage.setItem('debkams_products_updated', Date.now().toString());
 }
 
-// Delete product
-function deleteProduct(productId) {
-    if (confirm('Delete this product?')) {
+// Updated delete product - removes from Supabase AND localStorage
+async function deleteProduct(productId) {
+    if (confirm('Delete this product? This will remove it for ALL customers.')) {
+        // Delete from Supabase (cloud)
+        const cloudDeleteSuccess = await deleteProductFromSupabase(productId);
+        
+        if (cloudDeleteSuccess) {
+            alert('✅ Product deleted from cloud! Everyone will see the update.');
+        } else {
+            alert('⚠️ Cloud delete failed. Product removed locally only.');
+        }
+        
+        // Also remove from localStorage (backup)
         let products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
         products = products.filter(p => p.id !== productId);
         localStorage.setItem('debkams_products', JSON.stringify(products));
+        
+        // Refresh the display
         loadProducts();
         loadStats();
         
