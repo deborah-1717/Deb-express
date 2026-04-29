@@ -1,4 +1,4 @@
-// Supabase Configuration (YOUR WORKING CONFIG)
+// Supabase Configuration
 const SUPABASE_URL = 'https://lzclrjvwhllrubldijdz.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6Y2xyanZ3aGxscnVibGRpamR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczOTg1ODIsImV4cCI6MjA5Mjk3NDU4Mn0.3BczFo1jlNgGAunMhKjlL12l0fZjnpgKGuOXC2BrHYg';
 
@@ -9,13 +9,11 @@ let currentUser = null;
 let selectedRating = 0;
 const WHATSAPP_NUMBER = "2348061308703";
 
-// Language function
 function setLanguage(lang) {
     localStorage.setItem('debkam_lang', lang);
     location.reload();
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadProducts();
     loadCart();
@@ -27,41 +25,29 @@ document.addEventListener('DOMContentLoaded', function() {
     fixFloatingButton();
 });
 
-// Force fix floating button style
 function fixFloatingButton() {
     var btn = document.getElementById('floatingCheckoutBar');
     if (btn) {
         btn.style.cssText = 'display: none; position: fixed; bottom: 80px; right: 20px; background: #25D366; width: 50px; height: 50px; border-radius: 50%; z-index: 99999; box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; text-align: center;';
-        
         var icon = btn.querySelector('i');
-        if (icon) {
-            icon.style.cssText = 'font-size: 20px; line-height: 50px; color: white;';
-        }
-        
+        if (icon) icon.style.cssText = 'font-size: 20px; line-height: 50px; color: white;';
         var badge = document.getElementById('floatingItemCount');
-        if (badge) {
-            badge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;';
-        }
+        if (badge) badge.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;';
     }
 }
 
-// Load products from Supabase (cloud) or local storage
 async function loadProducts() {
     try {
-        console.log('Fetching products from Supabase...');
+        console.log('Fetching from Supabase...');
         const response = await fetch(`${SUPABASE_URL}/rest/v1/products?select=*`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
-        
         if (response.ok) {
             const data = await response.json();
             if (data && data.length > 0) {
                 products = data;
                 localStorage.setItem('debkams_products', JSON.stringify(products));
-                console.log(`✅ Loaded ${products.length} products from Supabase cloud`);
+                console.log(`✅ Loaded ${products.length} products from Supabase`);
             } else {
                 loadProductsFromLocal();
             }
@@ -69,20 +55,13 @@ async function loadProducts() {
             throw new Error(`HTTP ${response.status}`);
         }
     } catch (error) {
-        console.log('Supabase failed, using local products:', error);
+        console.log('Supabase failed:', error);
         loadProductsFromLocal();
     }
-    
-    // Update UI
-    if (typeof renderProducts === 'function') {
-        renderProducts();
-    }
-    if (document.getElementById('productsPreview')) {
-        displayFeaturedProducts();
-    }
+    if (typeof renderProducts === 'function') renderProducts();
+    if (document.getElementById('productsPreview')) displayFeaturedProducts();
 }
 
-// Load products from local storage (fallback)
 function loadProductsFromLocal() {
     const stored = localStorage.getItem('debkams_products');
     if (stored && JSON.parse(stored).length > 0) {
@@ -90,7 +69,7 @@ function loadProductsFromLocal() {
     } else {
         createDefaultProducts();
     }
-    console.log(`📦 Loaded ${products.length} products from local storage`);
+    console.log(`📦 Loaded ${products.length} from local`);
 }
 
 function createDefaultProducts() {
@@ -104,25 +83,22 @@ function createDefaultProducts() {
         { id:7, name:"Yoghurt", price:2500, img:"assets/21.webp", desc:"Creamy yoghurt", category:"drinks" },
         { id:8, name:"Fried Rice", price:5500, img:"assets/22.webp", desc:"Special fried rice", category:"savory" },
         { id:9, name:"Grilled Chicken", price:3500, img:"assets/23.webp", desc:"Spicy grilled chicken", category:"savory" },
-        { id:10, name:"Chocolate Croissant (box of 3)", price:12000, img:"assets/24.webp", desc:"Buttery chocolate croissants", category:"pastries" },
-        { id:11, name:"Cinnamon Rolls (box of 4)", price:12000, img:"assets/25.webp", desc:"Sweet cinnamon rolls", category:"pastries" },
+        { id:10, name:"Chocolate Croissant", price:12000, img:"assets/24.webp", desc:"Buttery chocolate croissants", category:"pastries" },
+        { id:11, name:"Cinnamon Rolls", price:12000, img:"assets/25.webp", desc:"Sweet cinnamon rolls", category:"pastries" },
         { id:12, name:"Meat Pie(6pcs)", price:6000, img:"assets/35.webp", desc:"Savory meat pie", category:"savory" },
         { id:13, name:"Chocolate Crunch Cake", price:8000, img:"assets/34.webp", desc:"Crunchy chocolate cake", category:"cakes" },
-        { id:14, name:"Burger and Fries With Chicken (Combo)", price:12000, img:"assets/36.webp", desc:"Complete meal combo", category:"savory" }
+        { id:14, name:"Burger and Fries Combo", price:12000, img:"assets/36.webp", desc:"Complete meal combo", category:"savory" }
     ];
     localStorage.setItem('debkams_products', JSON.stringify(products));
 }
 
 function renderProducts() {
-    if (typeof window.renderProducts === 'function') {
-        window.renderProducts();
-    }
+    if (typeof window.renderProducts === 'function') window.renderProducts();
 }
 
 function displayFeaturedProducts() {
     const previewContainer = document.getElementById('productsPreview');
     if (!previewContainer) return;
-    
     const featured = products.slice(0, 4);
     previewContainer.innerHTML = featured.map(product => `
         <div class="preview-card">
@@ -134,18 +110,13 @@ function displayFeaturedProducts() {
     `).join('');
 }
 
-// Add to cart from homepage
 function addToCartFromHome(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
     const existing = cart.find(i => i.id === productId);
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({ id: productId, name: product.name, price: product.price, quantity: 1 });
-    }
+    if (existing) existing.quantity++;
+    else cart.push({ id: productId, name: product.name, price: product.price, quantity: 1 });
     localStorage.setItem('debkams_cart', JSON.stringify(cart));
     loadCartCount();
     updateFloatingCheckoutBar();
@@ -169,7 +140,6 @@ function loadCartCount() {
 function updateFloatingCheckoutBar() {
     const bar = document.getElementById('floatingCheckoutBar');
     if (!bar) return;
-    
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
     if (cart.length > 0) {
         bar.style.display = 'block';
@@ -183,7 +153,6 @@ function checkUserStatus() {
     const user = localStorage.getItem('debkams_user');
     const logoutBtn = document.querySelector('.logout-btn-nav');
     const authCards = document.querySelector('.auth-section-home');
-    
     if (user) {
         currentUser = JSON.parse(user);
         if (logoutBtn) logoutBtn.style.display = 'inline-flex';
@@ -210,142 +179,107 @@ function showNotification(message, type) {
     setTimeout(() => notification.remove(), 3000);
 }
 
-// ========== CHECKOUT LOGIN PROTECTION ==========
-
+// Checkout functions
 function checkoutWithLogin() {
-    console.log('🔥 Checkout button clicked!');
-    
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
-    
     if (!cart || cart.length === 0) {
-        alert('❌ Your cart is empty! Add some items first.');
+        alert('❌ Your cart is empty!');
         return;
     }
-    
     const userJson = localStorage.getItem('debkams_user');
-    
     if (!userJson) {
-        alert('🔐 LOGIN REQUIRED\n\nPlease sign in or create an account to complete your order.');
+        alert('🔐 LOGIN REQUIRED!\n\nPlease sign in to checkout.');
         sessionStorage.setItem('redirectAfterLogin', 'checkout');
         showSignInModal();
         return;
     }
-    
     currentUser = JSON.parse(userJson);
     showCheckoutModal();
 }
 
 function showCheckoutModal() {
     const userJson = localStorage.getItem('debkams_user');
-    
     if (!userJson) {
-        alert('🔐 LOGIN REQUIRED!\n\nPlease sign in to checkout.');
+        alert('🔐 LOGIN REQUIRED!');
         showSignInModal();
         return;
     }
-    
     currentUser = JSON.parse(userJson);
-    
     const nameField = document.getElementById('checkoutName');
     const phoneField = document.getElementById('checkoutPhone');
     const addressField = document.getElementById('checkoutAddress');
-    
     if (nameField) nameField.value = currentUser.name || '';
     if (phoneField) phoneField.value = currentUser.phone || '';
     if (addressField) addressField.value = currentUser.address || '';
-    
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
     const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
-    
     const total = cart.reduce((sum, item) => {
         const product = products.find(p => p.id === item.id);
         return sum + ((product?.price || item.price) * item.quantity);
     }, 0);
-    
     const summaryDiv = document.getElementById('orderSummary');
     if (summaryDiv) {
-        if (cart.length === 0) {
-            summaryDiv.innerHTML = '<p>Your cart is empty</p>';
-        } else {
+        if (cart.length === 0) summaryDiv.innerHTML = '<p>Your cart is empty</p>';
+        else {
             summaryDiv.innerHTML = cart.map(item => {
                 const product = products.find(p => p.id === item.id);
                 return `<div class="summary-item">${item.quantity}x ${product?.name || item.name} - ₦${((product?.price || item.price) * item.quantity).toLocaleString()}</div>`;
             }).join('');
         }
     }
-    
     const orderTotal = document.getElementById('orderTotal');
     if (orderTotal) orderTotal.textContent = total.toLocaleString();
-    
     const now = new Date();
     now.setHours(now.getHours() + 2);
     const datetimeInput = document.getElementById('pickupTime');
-    if (datetimeInput && !datetimeInput.value) {
-        datetimeInput.value = now.toISOString().slice(0, 16);
-    }
-    
+    if (datetimeInput && !datetimeInput.value) datetimeInput.value = now.toISOString().slice(0, 16);
     const isPreorderCheckbox = document.getElementById('isPreorder');
     if (isPreorderCheckbox) isPreorderCheckbox.checked = false;
     const preorderFields = document.getElementById('preorderFields');
     if (preorderFields) preorderFields.style.display = 'none';
-    
     const modal = document.getElementById('checkoutModal');
     if (modal) modal.classList.add('open');
 }
 
 function submitOrder(event) {
     event.preventDefault();
-    
     const userJson = localStorage.getItem('debkams_user');
     if (!userJson) {
-        alert('🔐 LOGIN REQUIRED!\n\nYou must sign in or create an account to place an order.');
+        alert('🔐 LOGIN REQUIRED!');
         closeCheckoutModal();
         showSignInModal();
         return;
     }
-    
     currentUser = JSON.parse(userJson);
-    
     const delivery = document.getElementById('deliveryOption').value;
     const address = document.getElementById('checkoutAddress').value;
     const time = document.getElementById('pickupTime').value;
     const name = document.getElementById('checkoutName').value;
     const phone = document.getElementById('checkoutPhone').value;
-    
     const isPreorder = document.getElementById('isPreorder')?.checked || false;
     const preorderDate = isPreorder ? document.getElementById('preorderDate')?.value : null;
     const preorderTime = isPreorder ? document.getElementById('preorderTime')?.value : null;
     const preorderMessage = isPreorder ? document.getElementById('preorderMessage')?.value : null;
-    
     if (!name || !phone) {
         alert('Please enter your name and phone number');
         return;
     }
-    
     if (delivery === 'delivery' && !address) {
         alert('Please enter your delivery address');
         return;
     }
-    
     const cart = JSON.parse(localStorage.getItem('debkams_cart') || '[]');
     const products = JSON.parse(localStorage.getItem('debkams_products') || '[]');
-    
     if (cart.length === 0) {
         alert('Your cart is empty!');
         return;
     }
-    
     let total = cart.reduce((sum, item) => {
         const product = products.find(p => p.id === item.id);
         return sum + ((product?.price || item.price) * item.quantity);
     }, 0);
-    
     let message = `🍰 DEBKAM'S PASTRY PALACE - NEW ORDER 🍰\n\n`;
-    message += `Customer: ${name}\n`;
-    message += `Phone: ${phone}\n`;
-    message += `Payment: Bank Transfer\n`;
-    message += `Delivery: ${delivery === 'pickup' ? 'Pickup' : 'Delivery'}\n`;
-    
+    message += `Customer: ${name}\nPhone: ${phone}\nPayment: Bank Transfer\nDelivery: ${delivery === 'pickup' ? 'Pickup' : 'Delivery'}\n`;
     if (isPreorder) {
         message += `📅 PRE-ORDER: ${preorderDate} at ${preorderTime}\n`;
         if (preorderMessage) message += `🎁 Message: "${preorderMessage}"\n`;
@@ -353,7 +287,6 @@ function submitOrder(event) {
         if (delivery === 'delivery') message += `Address: ${address}\n`;
         message += `Time: ${new Date(time).toLocaleString()}\n`;
     }
-    
     message += `\nORDER ITEMS:\n`;
     cart.forEach(item => {
         const product = products.find(p => p.id === item.id);
@@ -362,7 +295,6 @@ function submitOrder(event) {
     });
     message += `\nTOTAL: ₦${total.toLocaleString()}\n`;
     message += `\n🏦 BANK TRANSFER\nBank: Opay\nAccount: DORIS SHOGADE AMAECHI\nNumber: 8087299383`;
-    
     const orders = JSON.parse(localStorage.getItem('debkams_orders') || '[]');
     const newOrder = {
         id: Date.now(),
@@ -378,22 +310,14 @@ function submitOrder(event) {
     };
     orders.push(newOrder);
     localStorage.setItem('debkams_orders', JSON.stringify(orders));
-    
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    
     localStorage.setItem('debkams_cart', JSON.stringify([]));
-    
     loadCartCount();
     updateFloatingCheckoutBar();
-    
-    alert(`✅ Order placed successfully!\n\nOrder ID: ${newOrder.id}\n\nPlease complete payment via bank transfer and send proof of payment to our WhatsApp.`);
-    
+    alert(`✅ Order placed! Order ID: ${newOrder.id}`);
     closeCheckoutModal();
-    
-    if (confirm('Would you like to track your order?')) {
-        window.location.href = 'track-order.html';
-    }
+    if (confirm('Track your order?')) window.location.href = 'track-order.html';
 }
 
 function closeCheckoutModal() {
@@ -404,23 +328,16 @@ function closeCheckoutModal() {
 function toggleAddressField() {
     const delivery = document.getElementById('deliveryOption').value;
     const addressGroup = document.getElementById('addressGroup');
-    if (addressGroup) {
-        addressGroup.style.display = delivery === 'delivery' ? 'block' : 'none';
-    }
+    if (addressGroup) addressGroup.style.display = delivery === 'delivery' ? 'block' : 'none';
 }
 
 function togglePreorderFields() {
     const isPreorder = document.getElementById('isPreorder')?.checked || false;
     const preorderFields = document.getElementById('preorderFields');
-    if (preorderFields) {
-        preorderFields.style.display = isPreorder ? 'block' : 'none';
-    }
+    if (preorderFields) preorderFields.style.display = isPreorder ? 'block' : 'none';
 }
 
-function proceedToCheckout() {
-    checkoutWithLogin();
-}
-
+function proceedToCheckout() { checkoutWithLogin(); }
 function requireLoginForCheckout() {
     const user = localStorage.getItem('debkams_user');
     if (!user) {
@@ -436,18 +353,7 @@ function showLoginRequiredModal() {
         modal = document.createElement('div');
         modal.id = 'loginRequiredModal';
         modal.className = 'modal';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px; text-align: center;">
-                <span class="close-modal" onclick="closeLoginRequiredModal()">&times;</span>
-                <i class="fas fa-lock" style="font-size: 48px; color: #d4af37; margin-bottom: 20px;"></i>
-                <h3>Login Required</h3>
-                <p>Please sign in or create an account to checkout.</p>
-                <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button onclick="closeLoginRequiredModal(); showSignInModal();" style="flex: 1; background: #d4af37; color: #1a1a1a; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Sign In</button>
-                    <button onclick="closeLoginRequiredModal(); showRegisterModal();" style="flex: 1; background: transparent; color: #d4af37; border: 2px solid #d4af37; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold;">Register</button>
-                </div>
-            </div>
-        `;
+        modal.innerHTML = `<div class="modal-content" style="max-width:400px;text-align:center;"><span class="close-modal" onclick="closeLoginRequiredModal()">&times;</span><i class="fas fa-lock" style="font-size:48px;color:#d4af37;margin-bottom:20px;"></i><h3>Login Required</h3><p>Please sign in to checkout.</p><div style="display:flex;gap:15px;margin-top:20px;"><button onclick="closeLoginRequiredModal();showSignInModal();" style="flex:1;background:#d4af37;color:#1a1a1a;border:none;padding:12px;border-radius:5px;cursor:pointer;font-weight:bold;">Sign In</button><button onclick="closeLoginRequiredModal();showRegisterModal();" style="flex:1;background:transparent;color:#d4af37;border:2px solid #d4af37;padding:12px;border-radius:5px;cursor:pointer;font-weight:bold;">Register</button></div></div>`;
         document.body.appendChild(modal);
     }
     modal.classList.add('open');
@@ -459,45 +365,26 @@ function closeLoginRequiredModal() {
 }
 
 // Auth functions
-function showSignInModal() {
-    const modal = document.getElementById('signInModal');
-    if (modal) modal.classList.add('open');
-}
-
-function showRegisterModal() {
-    const modal = document.getElementById('registerModal');
-    if (modal) modal.classList.add('open');
-}
-
+function showSignInModal() { document.getElementById('signInModal')?.classList.add('open'); }
+function showRegisterModal() { document.getElementById('registerModal')?.classList.add('open'); }
 function closeModals() {
     document.getElementById('signInModal')?.classList.remove('open');
     document.getElementById('registerModal')?.classList.remove('open');
     document.getElementById('checkoutModal')?.classList.remove('open');
     closeLoginRequiredModal();
 }
-
-function switchToRegister() {
-    closeModals();
-    showRegisterModal();
-}
-
-function switchToLogin() {
-    closeModals();
-    showSignInModal();
-}
+function switchToRegister() { closeModals(); showRegisterModal(); }
+function switchToLogin() { closeModals(); showSignInModal(); }
 
 function login() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
     const users = JSON.parse(localStorage.getItem('debkams_users') || '[]');
     const user = users.find(u => u.email === email && u.password === password);
-    
     if (user) {
         localStorage.setItem('debkams_user', JSON.stringify(user));
         alert(`Welcome back ${user.name}!`);
         closeModals();
-        
         const redirectTo = sessionStorage.getItem('redirectAfterLogin');
         if (redirectTo === 'checkout') {
             sessionStorage.removeItem('redirectAfterLogin');
@@ -517,26 +404,21 @@ function register() {
     const phone = document.getElementById('regPhone').value;
     const address = document.getElementById('regAddress').value;
     const password = document.getElementById('regPassword').value;
-    
     if (!name || !email || !phone || !address || !password) {
         alert('Please fill all fields');
         return;
     }
-    
     const users = JSON.parse(localStorage.getItem('debkams_users') || '[]');
     if (users.find(u => u.email === email)) {
         alert('Email already registered!');
         return;
     }
-    
     const newUser = { id: Date.now(), name, email, phone, address, password };
     users.push(newUser);
     localStorage.setItem('debkams_users', JSON.stringify(users));
     localStorage.setItem('debkams_user', JSON.stringify(newUser));
-    
-    alert('Registration successful! Welcome to Debkam\'s Pastry Palace!');
+    alert('Registration successful!');
     closeModals();
-    
     const redirectTo = sessionStorage.getItem('redirectAfterLogin');
     if (redirectTo === 'checkout') {
         sessionStorage.removeItem('redirectAfterLogin');
@@ -547,147 +429,68 @@ function register() {
     }
 }
 
-function goHome() {
-    window.location.href = 'index.html';
-}
-
+function goHome() { window.location.href = 'index.html'; }
 function logout() {
     localStorage.removeItem('debkams_user');
     localStorage.removeItem('debkams_cart');
     window.location.href = 'index.html';
 }
-
 function copyBankDetails() {
     const bankText = `Bank: Opay\nAccount Name: DORIS SHOGADE AMAECHI\nAccount Number: 8087299383`;
     navigator.clipboard.writeText(bankText);
-    alert('Bank details copied! 💰');
+    alert('Bank details copied!');
 }
-
 function trackOrder() {
     const orderNumber = document.getElementById('trackOrderNumber').value;
-    if (!orderNumber) {
-        alert('Please enter an order number');
-        return;
-    }
-    
+    if (!orderNumber) { alert('Please enter an order number'); return; }
     const orders = JSON.parse(localStorage.getItem('debkams_orders') || '[]');
     const order = orders.find(o => o.id.toString() === orderNumber);
-    
     const resultDiv = document.getElementById('trackResult');
     if (resultDiv) {
         if (order) {
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-                <div style="text-align:center;">
-                    <i class="fas fa-check-circle" style="font-size:3rem; color:var(--gold);"></i>
-                    <h3>Order #${order.id}</h3>
-                    <p><strong>Status:</strong> <span class="order-status status-${order.status?.toLowerCase() || 'pending'}">${order.status || 'Pending'}</span></p>
-                    <p><strong>Total:</strong> ₦${order.total}</p>
-                    <p><strong>Delivery:</strong> ${order.delivery}</p>
-                    <p><strong>Date:</strong> ${new Date(order.orderDate || order.date).toLocaleString()}</p>
-                </div>
-            `;
+            resultDiv.innerHTML = `<div style="text-align:center;"><i class="fas fa-check-circle" style="font-size:3rem;color:var(--gold);"></i><h3>Order #${order.id}</h3><p><strong>Status:</strong> ${order.status || 'Pending'}</p><p><strong>Total:</strong> ₦${order.total}</p><p><strong>Delivery:</strong> ${order.delivery}</p><p><strong>Date:</strong> ${new Date(order.orderDate).toLocaleString()}</p></div>`;
         } else {
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-                <div style="text-align:center; color:#dc3545;">
-                    <i class="fas fa-times-circle" style="font-size:3rem;"></i>
-                    <h3>Order Not Found</h3>
-                    <p>Please check your order number and try again.</p>
-                </div>
-            `;
+            resultDiv.innerHTML = `<div style="text-align:center;color:#dc3545;"><i class="fas fa-times-circle" style="font-size:3rem;"></i><h3>Order Not Found</h3></div>`;
         }
     }
 }
-
 function trackOrderPage() {
     const orderNumber = document.getElementById('trackInput').value;
-    if (!orderNumber) {
-        alert('Please enter an order number');
-        return;
-    }
-    
+    if (!orderNumber) { alert('Please enter an order number'); return; }
     const orders = JSON.parse(localStorage.getItem('debkams_orders') || '[]');
     const order = orders.find(o => o.id.toString() === orderNumber);
-    
     const resultDiv = document.getElementById('trackResultPage');
     if (resultDiv) {
         if (order) {
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-                <h3>Order #${order.id}</h3>
-                <div class="track-timeline">
-                    <div class="timeline-step ${order.status === 'Pending' ? 'active' : 'completed'}">
-                        <i class="fas fa-receipt"></i>
-                        <span>Order Placed</span>
-                    </div>
-                    <div class="timeline-step ${order.status === 'Preparing' ? 'active' : order.status === 'Ready' || order.status === 'Delivered' ? 'completed' : ''}">
-                        <i class="fas fa-utensils"></i>
-                        <span>Preparing</span>
-                    </div>
-                    <div class="timeline-step ${order.status === 'Ready' ? 'active' : order.status === 'Delivered' ? 'completed' : ''}">
-                        <i class="fas fa-box"></i>
-                        <span>Ready</span>
-                    </div>
-                    <div class="timeline-step ${order.status === 'Delivered' ? 'active' : ''}">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Delivered</span>
-                    </div>
-                </div>
-                <p><strong>Total:</strong> ₦${order.total}</p>
-                <p><strong>Delivery:</strong> ${order.delivery}</p>
-                <p><strong>Date:</strong> ${new Date(order.orderDate || order.date).toLocaleString()}</p>
-            `;
+            resultDiv.innerHTML = `<h3>Order #${order.id}</h3><div class="track-timeline"><div class="timeline-step ${order.status === 'Pending' ? 'active' : 'completed'}"><i class="fas fa-receipt"></i><span>Order Placed</span></div><div class="timeline-step ${order.status === 'Preparing' ? 'active' : order.status === 'Ready' || order.status === 'Delivered' ? 'completed' : ''}"><i class="fas fa-utensils"></i><span>Preparing</span></div><div class="timeline-step ${order.status === 'Ready' ? 'active' : order.status === 'Delivered' ? 'completed' : ''}"><i class="fas fa-box"></i><span>Ready</span></div><div class="timeline-step ${order.status === 'Delivered' ? 'active' : ''}"><i class="fas fa-check-circle"></i><span>Delivered</span></div></div><p><strong>Total:</strong> ₦${order.total}</p><p><strong>Delivery:</strong> ${order.delivery}</p><p><strong>Date:</strong> ${new Date(order.orderDate).toLocaleString()}</p>`;
         } else {
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `<p style="color:#dc3545;">Order not found. Please check your order number.</p>`;
+            resultDiv.innerHTML = `<p style="color:#dc3545;">Order not found.</p>`;
         }
     }
-    
     displayRecentOrders();
 }
-
 function displayRecentOrders() {
     const orders = JSON.parse(localStorage.getItem('debkams_orders') || '[]');
     const recentOrders = orders.slice(-5).reverse();
     const container = document.getElementById('recentOrdersList');
-    
     if (container && recentOrders.length > 0) {
-        container.innerHTML = recentOrders.map(order => `
-            <div class="recent-order-item" onclick="document.getElementById('trackInput').value='${order.id}'; trackOrderPage();">
-                <span>Order #${order.id}</span>
-                <span>₦${order.total}</span>
-                <span class="order-status status-${order.status?.toLowerCase() || 'pending'}">${order.status || 'Pending'}</span>
-            </div>
-        `).join('');
+        container.innerHTML = recentOrders.map(order => `<div class="recent-order-item" onclick="document.getElementById('trackInput').value='${order.id}'; trackOrderPage();"><span>Order #${order.id}</span><span>₦${order.total}</span><span class="order-status status-${order.status?.toLowerCase() || 'pending'}">${order.status || 'Pending'}</span></div>`).join('');
     }
 }
-
 function loadReviews() {
     const reviews = JSON.parse(localStorage.getItem('debkams_reviews') || '[]');
     const reviewsGrid = document.getElementById('reviewsGrid');
-    
     if (reviewsGrid && reviews.length > 0) {
-        reviewsGrid.innerHTML = reviews.slice(-3).reverse().map(review => `
-            <div class="review-card">
-                <div class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div>
-                <p>"${review.text}"</p>
-                <div class="reviewer">
-                    <i class="fas fa-user-circle"></i>
-                    <div>
-                        <h4>${review.name}</h4>
-                        <span>Verified Buyer</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        reviewsGrid.innerHTML = reviews.slice(-3).reverse().map(review => `<div class="review-card"><div class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</div><p>"${review.text}"</p><div class="reviewer"><i class="fas fa-user-circle"></i><div><h4>${review.name}</h4><span>Verified Buyer</span></div></div></div>`).join('');
     }
 }
-
 function showReviewModal() {
     const modal = document.getElementById('reviewModal');
     if (modal) modal.classList.add('open');
-    
     document.querySelectorAll('.stars-input i').forEach(star => {
         star.onclick = () => {
             const rating = parseInt(star.dataset.rating);
@@ -706,31 +509,20 @@ function showReviewModal() {
         };
     });
 }
-
-function closeReviewModal() {
-    document.getElementById('reviewModal')?.classList.remove('open');
-    selectedRating = 0;
-}
-
+function closeReviewModal() { document.getElementById('reviewModal')?.classList.remove('open'); selectedRating = 0; }
 function submitReview() {
     const name = document.getElementById('reviewName').value;
     const text = document.getElementById('reviewText').value;
-    
-    if (!name || !text || selectedRating === 0) {
-        alert('Please fill all fields and select a rating');
-        return;
-    }
-    
+    if (!name || !text || selectedRating === 0) { alert('Please fill all fields'); return; }
     const reviews = JSON.parse(localStorage.getItem('debkams_reviews') || '[]');
     reviews.push({ id: Date.now(), name, text, rating: selectedRating, date: new Date().toISOString() });
     localStorage.setItem('debkams_reviews', JSON.stringify(reviews));
-    
     alert('Thank you for your review!');
     closeReviewModal();
     loadReviews();
 }
 
-// Make ALL functions global
+// Make functions global
 window.setLanguage = setLanguage;
 window.showSignInModal = showSignInModal;
 window.showRegisterModal = showRegisterModal;
@@ -759,4 +551,4 @@ window.toggleAddressField = toggleAddressField;
 window.togglePreorderFields = togglePreorderFields;
 window.renderProducts = renderProducts;
 
-console.log('Script loaded! Products will load from Supabase cloud.');
+console.log('Script loaded! Products load from Supabase cloud.');
